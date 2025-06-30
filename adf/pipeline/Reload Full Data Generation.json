@@ -1,0 +1,168 @@
+{
+	"name": "Reload Full Data Generation",
+	"properties": {
+		"activities": [
+			{
+				"name": "Process Days",
+				"type": "Until",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@greaterOrEquals(variables('currentDate'), pipeline().parameters.endDate)",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Squirrel CSV Data Generator",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "Squirrel CSV Data Generator",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"p_run_date": {
+										"value": "@variables('currentDate')",
+										"type": "Expression"
+									}
+								}
+							}
+						},
+						{
+							"name": "Increment to NextDate",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Squirrel CSV Data Generator",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "nextDate",
+								"value": {
+									"value": "@formatDateTime(\n  addDays(\n    concat(\n      substring(variables('currentDate'), 0, 4), '-',     \n      substring(variables('currentDate'), 4, 2), '-',     \n      substring(variables('currentDate'), 6, 2)\n    ),\n    1\n  ),\n  'yyyyMMdd'\n)\n",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set CurrentDate to NextDate",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Wait 5 seconds",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "currentDate",
+								"value": {
+									"value": "@variables('nextDate')",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Wait 5 seconds",
+							"type": "Wait",
+							"dependsOn": [
+								{
+									"activity": "Increment to NextDate",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 5
+							}
+						}
+					],
+					"timeout": "0.12:00:00"
+				}
+			},
+			{
+				"name": "Execute Medallion Load_copy1",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Wait 5 seconds before Processing_copy1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Medallion_Load",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Wait 5 seconds before Processing_copy1",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "Process Days",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 5
+				}
+			}
+		],
+		"parameters": {
+			"startDate": {
+				"type": "string"
+			},
+			"endDate": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"currentDate": {
+				"type": "String",
+				"defaultValue": "@pipeline().parameters.startDate"
+			},
+			"nextDate": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Utilities"
+		},
+		"annotations": []
+	}
+}
