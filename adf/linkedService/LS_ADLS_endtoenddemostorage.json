@@ -1,0 +1,11 @@
+{
+	"name": "LS_ADLS_endtoenddemostorage",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobStorage",
+		"typeProperties": {
+			"serviceEndpoint": "https://endtoenddemostorage.blob.core.windows.net/",
+			"accountKind": "StorageV2"
+		}
+	}
+}
