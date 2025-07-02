@@ -1,0 +1,7 @@
+{
+	"name": "adf-pe-synapse",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/b32014a3-d670-48c9-9172-5c517f4411fd/resourceGroups/rg-end-to-end-demo/providers/Microsoft.Synapse/workspaces/synwendtoenddemo",
+		"groupId": "sql"
+	}
+}
