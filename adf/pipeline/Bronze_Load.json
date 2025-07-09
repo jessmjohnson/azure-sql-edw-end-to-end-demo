@@ -421,6 +421,37 @@
 							"typeProperties": {
 								"source": {
 									"type": "DelimitedTextSource",
+									"additionalColumns": [
+										{
+											"name": "source_file_name",
+											"value": "$$FILEPATH"
+										},
+										{
+											"name": "ingestion_timestamp",
+											"value": {
+												"value": "@utcNow()",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "source_system",
+											"value": "Sample Data"
+										},
+										{
+											"name": "ingestion_run_id",
+											"value": {
+												"value": "@pipeline().RunId",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "ingested_by",
+											"value": {
+												"value": "@pipeline().Pipeline",
+												"type": "Expression"
+											}
+										}
+									],
 									"storeSettings": {
 										"type": "AzureBlobFSReadSettings",
 										"recursive": true,
@@ -434,7 +465,14 @@
 									"type": "SqlDWSink",
 									"allowCopyCommand": true
 								},
-								"enableStaging": false
+								"enableStaging": true,
+								"stagingSettings": {
+									"linkedServiceName": {
+										"referenceName": "LS_ADLS_endtoenddemostorage",
+										"type": "LinkedServiceReference"
+									},
+									"path": "bronze/staging"
+								}
 							},
 							"inputs": [
 								{
