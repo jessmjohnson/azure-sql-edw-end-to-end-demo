@@ -1,0 +1,22 @@
+{
+	"name": "DemoServerless",
+	"properties": {
+		"Name": "DemoServerless",
+		"EntityType": "DATABASE",
+		"Origin": {
+			"Type": "SPARK"
+		},
+		"Properties": {
+			"IsSyMSCDMDatabase": true
+		},
+		"Source": {
+			"Provider": "ADLS",
+			"Location": "abfss://source-squirrel-data@stendtoenddemo.dfs.core.windows.net/",
+			"Properties": {
+				"FormatType": "csv",
+				"LinkedServiceName": "LS_stendtoenddemo"
+			}
+		}
+	},
+	"type": "DATABASE"
+}
